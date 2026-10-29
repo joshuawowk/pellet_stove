@@ -76,7 +76,7 @@ Two values in the profile are assumptions you may need to change:
 
 **If Home Assistant's built-in Tuya integration uses the same Tuya Smart account**, the stove also shows up there as a climate entity. Its room temperature reads -20. Tuya's cloud model for this product maps only the generic heater DPs 1–3 (`switch`, `temp_set` in °C, `temp_current`), and the stove doesn't use DPs 2 and 3. This is the "random negative temperature" described in the main README. Once tuya-local works, disable the stove's device in the built-in Tuya integration so you don't have two climate entities.
 
-**If the profile doesn't match** (tuya-local logs a `LOCAL DPS` warning), compare the logged values with the `dps_val` strings in the profile. The enum strings `p1`–`p4` / `ECO1`/`ECO2` come from a sibling stove on the same controller (tuya-local [#3596](https://github.com/make-all/tuya-local/issues/3596)). Yours may differ in case or wording. You can also check the stove outside HA with [`tools/stove_check.py`](../tools/stove_check.py):
+**If the profile doesn't match** (tuya-local logs a `LOCAL DPS` warning), compare the logged values with the `dps_val` strings in the profile. A live stove (product `8Dj5zVjGqPSXaUgf`) sends `"P1"` and `"ECO2"`. A sibling stove on the same controller sends lower-case `"p1"`–`"p4"` (tuya-local [#3596](https://github.com/make-all/tuya-local/issues/3596)). Case matters: if your stove sends lower case, edit the four `dps_val` lines under `preset_mode`. You can also check the stove outside HA with [`tools/stove_check.py`](../tools/stove_check.py):
 
 ```sh
 STOVE_IP=... STOVE_ID=... STOVE_KEY=... uv run --with tinytuya tools/stove_check.py
@@ -133,4 +133,5 @@ The fixed basic config builds on ESPHome 2026.10.1. Earlier revisions failed to 
 
 - Validated by tuya-local's own config tests (`tests/test_device_config.py`, 33 passed) and its `yamllint` rules, at tuya-local commit `2454696` (2026-10-27).
 - `util.best_match` scores it the **100% best match among 1,783 bundled configs** for the expected stove DPS, with or without the optional DP 105.
-- **Not yet confirmed against a live stove.** The first `LOCAL DPS` line from the real stove is the final check (§3.2).
+- **Confirmed on a live stove (2026-10-29)** running stock TYWE1S firmware on protocol 3.3. tuya-local 2026.10.0 picked this profile at setup ("Device matches pellet_stove_tywe1s with quality of 101%"). LOCAL DPS: `{"1": false, "4": "P1", "101": "ECO2", "104": 0, "105": "F", "106": 66, "107": 70, "108": 72, "109": 77}`. That line showed the power level is upper case (`P1`), so the profile was corrected from the sibling stove's lower case.
+- Seen live so far: `P1` and `ECO2` only. `P2`–`P4` and `ECO1` follow the same pattern but haven't been observed yet. Writes (on/off, set temperature, power level, ECO) haven't been tested yet either.
