@@ -54,7 +54,7 @@ Tuya Smart accepted this stove's OEM product (`8Dj5zVjGqPSXaUgf`) on the first s
 
 ### 3.2 Install tuya-local and the stove profile in Home Assistant
 
-1. Install **Tuya Local** from HACS (`make-all/tuya-local`).
+1. In HACS, add `make-all/tuya-local` as a **custom repository** (⋮ → **Custom repositories**, type **Integration**). It isn't in HACS's default store. Then download **Tuya Local** from HACS.
 2. Copy [`tuya-local/pellet_stove_tywe1s.yaml`](../tuya-local/pellet_stove_tywe1s.yaml) to `<HA config>/custom_components/tuya_local/devices/`. Restart Home Assistant. **Copy it again after every tuya-local update**: the integration replaces that folder.
 3. **[you]** Go to **Settings → Devices & services → Add integration → Tuya Local** and choose the cloud-assisted login. It asks for the **User Code** from Tuya Smart (**Me → ⚙ Settings → Account and Security → User Code**). Then scan the QR code it shows with Tuya Smart. No Tuya developer account is needed.
 4. Choose the stove. tuya-local fills in the device id, local key and IP address. It should offer **"Pellet stove"** as the top match.
@@ -73,6 +73,8 @@ Two values in the profile are assumptions you may need to change:
 
 - **Units.** The climate entity follows the stove's unit setting (DP 105), but the exhaust and protection sensors are fixed to °F. Keep the stove's front panel on **F** (password `1109` menu, upstream discussion #12). If you switch it to C, change the `unit: F` lines in the profile to `unit: C`.
 - **Set-temperature range.** The 50–90 °F limit is only a UI clamp, a guess. The stove's real limits are in the Tuya data model ("Query Things Data Model" on platform.tuya.com). Widen the `range` if the stove accepts more.
+
+**If Home Assistant's built-in Tuya integration uses the same Tuya Smart account**, the stove also shows up there as a climate entity. Its room temperature reads -20. Tuya's cloud model for this product maps only the generic heater DPs 1–3 (`switch`, `temp_set` in °C, `temp_current`), and the stove doesn't use DPs 2 and 3. This is the "random negative temperature" described in the main README. Once tuya-local works, disable the stove's device in the built-in Tuya integration so you don't have two climate entities.
 
 **If the profile doesn't match** (tuya-local logs a `LOCAL DPS` warning), compare the logged values with the `dps_val` strings in the profile. The enum strings `p1`–`p4` / `ECO1`/`ECO2` come from a sibling stove on the same controller (tuya-local [#3596](https://github.com/make-all/tuya-local/issues/3596)). Yours may differ in case or wording. You can also check the stove outside HA with [`tools/stove_check.py`](../tools/stove_check.py):
 
