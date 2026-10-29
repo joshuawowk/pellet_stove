@@ -10,9 +10,11 @@
 # Mapping basis:
 #  - DP ids and types: ESPHome TuyaMCU dump from this stove family
 #    (repo README; upstream discussion #31).
-#  - LAN enum strings (p1..p4, ECO1/ECO2): LOCAL DPS of a sibling stove on
-#    the same controller family (make-all/tuya-local issue #3596). If your
-#    "LOCAL DPS" log line shows different strings, edit the dps_val values.
+#  - LAN enum strings: a live stove (product 8Dj5zVjGqPSXaUgf) reported
+#    "P1" and "ECO2" in its LOCAL DPS line, so P2-P4 are assumed to be
+#    upper case too. ECO1 comes from a sibling stove (make-all/tuya-local
+#    issue #3596), whose lower-case "p1" was wrong for this one. If your
+#    "LOCAL DPS" log line differs, edit the dps_val values.
 #  - The stove reports every temperature DP in degrees F (README). If the
 #    stove panel is switched to C, change the sensor `unit: F` lines.
 #  - The 50-90 F set-temperature range is a UI clamp guess; the stove's
@@ -38,13 +40,13 @@ entities:
         type: string
         name: preset_mode
         mapping:
-          - dps_val: p1
+          - dps_val: P1
             value: P1
-          - dps_val: p2
+          - dps_val: P2
             value: P2
-          - dps_val: p3
+          - dps_val: P3
             value: P3
-          - dps_val: p4
+          - dps_val: P4
             value: P4
       - id: 105
         type: string
